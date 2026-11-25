@@ -37,6 +37,15 @@ jobs:
           path: doltlite
           persist-credentials: false
       - run: git -C doltlite log -1 --format='%H %s'
+      # The fix branch's version of doltlite's Windows path test, which adds the verbatim path case.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Hebilicious/doltlite
+          ref: fix/windows-verbatim-path-lock
+          path: fix
+          sparse-checkout: test/windows_path_smoke.sh
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - uses: msys2/setup-msys2@3c51bf698df1e37b2261f53cb67797b97761185c # v2.34.0
         with:
           msystem: MINGW64
@@ -51,8 +60,7 @@ jobs:
       - name: repro.ps1
         run: ./repro.ps1 -Doltlite doltlite/build/doltlite.exe
         shell: pwsh
-      # doltlite's own Windows path test. The fix branch adds the verbatim path case to it.
-      - name: test/windows_path_smoke.sh
+      - name: test/windows_path_smoke.sh of the fix branch
         if: ${{ !cancelled() }}
         shell: msys2 {0}
-        run: cd doltlite/build && bash ../test/windows_path_smoke.sh ./doltlite.exe
+        run: cd doltlite/build && bash ../../fix/test/windows_path_smoke.sh ./doltlite.exe
