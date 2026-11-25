@@ -36,6 +36,7 @@ jobs:
           ref: ${{ matrix.ref }}
           path: doltlite
           persist-credentials: false
+      - run: git -C doltlite log -1 --format='%H %s'
       - uses: msys2/setup-msys2@3c51bf698df1e37b2261f53cb67797b97761185c # v2.34.0
         with:
           msystem: MINGW64
@@ -44,7 +45,6 @@ jobs:
       - name: Build doltlite.exe
         shell: msys2 {0}
         run: |
-          git -C doltlite log -1 --format='%H %s'
           mkdir -p doltlite/build && cd doltlite/build
           ../configure
           make -j$(nproc) 'T.link=$(T.cc.sqlite) -static' doltlite.exe
