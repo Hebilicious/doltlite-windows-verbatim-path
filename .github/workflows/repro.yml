@@ -4,11 +4,49 @@ permissions:
   contents: read
 jobs:
   release:
-    name: doltlite release
+    name: doltlite 0.51.15 release
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - run: ./repro.ps1
+        shell: pwsh
+
+  source:
+    name: doltlite built from ${{ matrix.name }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: dolthub/doltlite master
+            repository: dolthub/doltlite
+            ref: master
+          - name: the fix branch
+            repository: Hebilicious/doltlite
+            ref: fix/windows-verbatim-path-lock
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref }}
+          path: doltlite
+          persist-credentials: false
+      - uses: msys2/setup-msys2@3c51bf698df1e37b2261f53cb67797b97761185c # v2.34.0
+        with:
+          msystem: MINGW64
+          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-zlib make tcl
+      # The same build as the Windows job of doltlite's release workflow.
+      - name: Build doltlite.exe
+        shell: msys2 {0}
+        run: |
+          git -C doltlite log -1 --format='%H %s'
+          mkdir -p doltlite/build && cd doltlite/build
+          ../configure
+          make -j$(nproc) 'T.link=$(T.cc.sqlite) -static' doltlite.exe
+      - run: ./repro.ps1 -Doltlite doltlite/build/doltlite.exe
         shell: pwsh
