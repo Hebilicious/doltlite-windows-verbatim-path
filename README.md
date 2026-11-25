@@ -47,8 +47,10 @@ Windows cannot open.
 
 ## Fix
 
-- Issue: https://github.com/Hebilicious/doltlite/issues/1
-- Pull request: https://github.com/Hebilicious/doltlite/pull/2
+- Upstream issue: https://github.com/dolthub/doltlite/issues/5392
+- Upstream pull request: https://github.com/dolthub/doltlite/pull/5393
+- Fork issue: https://github.com/Hebilicious/doltlite/issues/1
+- Fork pull request: https://github.com/Hebilicious/doltlite/pull/2
 
 The [workflow](.github/workflows/repro.yml) runs `repro.ps1` on the release, and on `doltlite.exe`
 built from `master` and from the fix branch. It also runs the fix branch's
