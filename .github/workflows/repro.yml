@@ -48,5 +48,11 @@ jobs:
           mkdir -p doltlite/build && cd doltlite/build
           ../configure
           make -j$(nproc) 'T.link=$(T.cc.sqlite) -static' doltlite.exe
-      - run: ./repro.ps1 -Doltlite doltlite/build/doltlite.exe
+      - name: repro.ps1
+        run: ./repro.ps1 -Doltlite doltlite/build/doltlite.exe
         shell: pwsh
+      # doltlite's own Windows path test. The fix branch adds the verbatim path case to it.
+      - name: test/windows_path_smoke.sh
+        if: ${{ !cancelled() }}
+        shell: msys2 {0}
+        run: cd doltlite/build && bash ../test/windows_path_smoke.sh ./doltlite.exe
